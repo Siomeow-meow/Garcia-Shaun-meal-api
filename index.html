@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Food Menu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 50%;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .search-section {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        input {
+            padding: 5px;
+        }
+        button {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Food Menu</h1>
+
+    <!-- Button to display all food items -->
+    <button onclick="loadFoods()">Display All Food Menu</button>
+
+    <!-- Table to display food items -->
+    <table id="foodTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Food</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody id="foodList">
+            <!-- Data will be inserted here -->
+        </tbody>
+    </table>
+
+    <!-- Search section based on the whiteboard -->
+    <div class="search-section">
+        <label>ID</label>
+        <input type="number" id="searchId" placeholder="Enter ID">
+        <button onclick="searchFood()">Search</button>
+    </div>
+
+    <script>
+        // Function to display all food items (Display All Food Menu)
+        async function loadFoods() {
+            const response = await fetch("api/foods");
+            const foods = await response.json();
+            const list = document.getElementById("foodList");
+
+            list.innerHTML = ""; // Clear existing rows
+
+            foods.forEach(food => {
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+                    <td>${food.id}</td>
+                    <td>${food.food}</td>
+                    <td>${food.price}</td>
+                `;
+                list.appendChild(row);
+            });
+        }
+
+        // Function to search for a specific food by ID
+        async function searchFood() {
+            const idInput = document.getElementById("searchId").value;
+            if (!idInput) {
+                alert("Please enter an ID");
+                return;
+            }
+
+            const response = await fetch(`api/foods/${idInput}`);
+            
+            if (response.status === 404) {
+                alert("Food not found");
+                return;
+            }
+
+            const food = await response.json();
+            const list = document.getElementById("foodList");
+
+            // Clear the table and display only the searched result
+            list.innerHTML = "";
+            
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${food.id}</td>
+                <td>${food.food}</td>
+                <td>${food.price}</td>
+            `;
+            list.appendChild(row);
+        }
+    </script>
+</body>
+</html>
